@@ -4,14 +4,20 @@ services:
   llmsrv:
     build:
       context: .
-    ports:
-      - "8080:8080"
+    restart: unless-stopped
     environment:
       - MODEL=/models/Llama-3.2-8B-Instruct.Q8_0.gguf
       - N_CTX=8192
       - N_BATCH=512
     volumes:
       - /home/joseph/models:/models
+    labels:
+      - "traefik.enable=true"
+        # echo $(htpasswd -nB user) | sed -e s/\\$/\\$\\$/g
+      - "traefik.http.middlewares.llmsrv-auth.basicauth.users=${TRAEFIK_AUTH}"
+      - "traefik.http.routers.llmsrv.rule=Host(`llmsrv.hirsch.ee`)"
+      - "traefik.http.routers.llmsrv.middlewares=llmsrv-auth@docker"
+
     deploy:
       resources:
         reservations:
@@ -19,3 +25,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
+networks:
+  traefik:
+     external: true
