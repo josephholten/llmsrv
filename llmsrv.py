@@ -1,10 +1,11 @@
 import sys
 import time
 from llama_cpp import Llama
+import os
 
-MODEL_PATH = "/home/joseph/models/Llama-3.2-8B-Instruct.Q8_0.gguf"
-N_CTX = 8192
-N_BATCH = 512
+MODEL_PATH = os.environ["MODEL"]
+N_CTX = os.environ["N_CTX"]
+N_BATCH = os.environ["N_BATCH"]
 
 from fastapi import FastAPI
 from pydantic import BaseModel
